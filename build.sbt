@@ -20,7 +20,7 @@ javacOptions in ThisBuild ++= {
   }
 }
 
-organization in ThisBuild := "com.thesamet.scalapb"
+organization in ThisBuild := "com.github.xenoby"
 
 resolvers in ThisBuild +=
   "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
@@ -65,16 +65,24 @@ lazy val runtime = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(
     name := "scalapb-runtime",
     libraryDependencies ++= Seq(
-      "com.thesamet.scalapb" %%% "lenses" % "0.7.0-test2",
-      "com.lihaoyi" %%% "fastparse" % "1.0.0",
-      "com.lihaoyi" %%% "utest" % "0.6.3" % "test"
+      "com.github.xenoby" %%% "lenses" % "0.7.0-rc7",
+      "com.github.xenoby" %%% "fastparse" % "1.0.0"
+      // "com.lihaoyi" %%% "utest" % "0.6.3" % "test"
     ),
     testFrameworks += new TestFramework("utest.runner.Framework"),
-    unmanagedResourceDirectories in Compile += baseDirectory.value / "../../protobuf"
+    unmanagedResourceDirectories in Compile += baseDirectory.value / "../../protobuf",
+    resolvers += "Sonatype staging" at "https://oss.sonatype.org/content/repositories/staging",
+    publishTo := Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2"),
+    credentials ++= {
+      lazy val credentials = sys.props("credentials")
+      val credentialsFile = if (credentials != null) new File(credentials) else null
+      if (credentialsFile != null) List(new FileCredentials(credentialsFile))
+      else Nil
+    }
   )
   .platformsSettings(JSPlatform, NativePlatform)(
     libraryDependencies ++= Seq(
-      "com.thesamet.scalapb" %%% "protobuf-runtime-scala" % "0.7.0.1"
+      "com.github.xenoby" %%% "protobuf-runtime-scala" % "0.7.0-rc7"
     ),
     (unmanagedSourceDirectories in Compile) += baseDirectory.value / ".." / "non-jvm" / "src" / "main" / "scala"
   )
